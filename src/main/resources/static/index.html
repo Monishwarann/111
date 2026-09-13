@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise HRMS - Human Resource Management System</title>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+
+    <!-- LOGIN MODAL / SCREEN -->
+    <div id="login-overlay" class="login-overlay">
+        <div class="login-card glass-panel">
+            <div class="login-header">
+                <div class="app-logo">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>HRMS <strong>NEXUS</strong></span>
+                </div>
+                <h2>Enterprise Portal Login</h2>
+                <p>Welcome back! Please enter your account credentials.</p>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-username"><i class="fa-solid fa-user"></i> Username</label>
+                    <input type="text" id="login-username" placeholder="e.g. admin, hr, employee" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password"><i class="fa-solid fa-lock"></i> Password</label>
+                    <input type="password" id="login-password" placeholder="Enter password" required>
+                </div>
+                <button type="submit" id="login-btn" class="btn btn-primary btn-block">
+                    <span class="btn-text">Sign In to Dashboard</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <div class="sample-credentials">
+                <h4><i class="fa-solid fa-key"></i> Quick Demo Accounts</h4>
+                <div class="demo-chips">
+                    <button class="chip" onclick="fillDemoCredentials('admin', 'admin123')">
+                        <strong>ADMIN:</strong> admin / admin123
+                    </button>
+                    <button class="chip" onclick="fillDemoCredentials('hr', 'hr123')">
+                        <strong>HR:</strong> hr / hr123
+                    </button>
+                    <button class="chip" onclick="fillDemoCredentials('employee', 'employee123')">
+                        <strong>EMPLOYEE:</strong> employee / employee123
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP LAYOUT -->
+    <div id="app-container" class="app-container hidden">
+        <!-- SIDEBAR -->
+        <aside class="sidebar glass-panel">
+            <div class="sidebar-header">
+                <div class="app-logo">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>HRMS <strong>NEXUS</strong></span>
+                </div>
+                <button id="mobile-sidebar-close" class="mobile-only btn-icon">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-item active" data-view="dashboard">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#employees" class="nav-item" data-view="employees">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Employees</span>
+                </a>
+                <a href="#attendance" class="nav-item" data-view="attendance">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span>Attendance</span>
+                </a>
+                <a href="#leaves" class="nav-item" data-view="leaves">
+                    <i class="fa-solid fa-calendar-minus"></i>
+                    <span>Leave Requests</span>
+                </a>
+                <a href="#payroll" class="nav-item" data-view="payroll">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <span>Payroll</span>
+                </a>
+                <a href="#performance" class="nav-item" data-view="performance">
+                    <i class="fa-solid fa-award"></i>
+                    <span>Performance</span>
+                </a>
+                <a href="#reports" class="nav-item" data-view="reports">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Reports & Analytics</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-badge">
+                    <div class="avatar-circle" id="user-avatar-initials">A</div>
+                    <div class="user-info">
+                        <span id="user-name-display" class="user-name">Administrator</span>
+                        <span id="user-role-badge" class="badge badge-role">ADMIN</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            <!-- TOPBAR -->
+            <header class="topbar glass-panel">
+                <div class="topbar-left">
+                    <button id="mobile-menu-toggle" class="mobile-only btn-icon">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 id="view-title" class="view-title">Dashboard</h1>
+                </div>
+                <div class="topbar-right">
+                    <button id="quick-punch-btn" class="btn btn-emerald btn-sm" title="Quick Punch In / Out">
+                        <i class="fa-solid fa-fingerprint"></i> <span id="punch-btn-text">Punch In</span>
+                    </button>
+                    <button id="theme-toggle-btn" class="btn btn-icon-outline" title="Toggle Light/Dark Theme">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                    <div class="live-clock" id="live-clock">
+                        <i class="fa-regular fa-clock"></i> <span id="clock-text">--:--:--</span>
+                    </div>
+                    <button id="logout-btn" class="btn btn-outline-danger btn-sm">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </button>
+                </div>
+            </header>
+
+            <!-- DYNAMIC VIEW CONTAINER -->
+            <div id="content-area" class="content-area">
+
+                <!-- DASHBOARD VIEW -->
+                <section id="view-dashboard" class="view-section active">
+                    <div class="kpi-grid">
+                        <div class="kpi-card glass-panel border-accent-indigo">
+                            <div class="kpi-icon"><i class="fa-solid fa-users"></i></div>
+                            <div class="kpi-data">
+                                <span class="kpi-label">Total Employees</span>
+                                <h3 id="kpi-total-emp" class="kpi-value">0</h3>
+                            </div>
+                        </div>
+                        <div class="kpi-card glass-panel border-accent-emerald">
+                            <div class="kpi-icon"><i class="fa-solid fa-user-check"></i></div>
+                            <div class="kpi-data">
+                                <span class="kpi-label">Active Staff</span>
+                                <h3 id="kpi-active-emp" class="kpi-value">0</h3>
+                            </div>
+                        </div>
+                        <div class="kpi-card glass-panel border-accent-blue">
+                            <div class="kpi-icon"><i class="fa-solid fa-calendar-day"></i></div>
+                            <div class="kpi-data">
+                                <span class="kpi-label">Present Today</span>
+                                <h3 id="kpi-present-today" class="kpi-value">0</h3>
+                            </div>
+                        </div>
+                        <div class="kpi-card glass-panel border-accent-rose">
+                            <div class="kpi-icon"><i class="fa-solid fa-user-xmark"></i></div>
+                            <div class="kpi-data">
+                                <span class="kpi-label">Absent Today</span>
+                                <h3 id="kpi-absent-today" class="kpi-value">0</h3>
+                            </div>
+                        </div>
+                        <div class="kpi-card glass-panel border-accent-amber">
+                            <div class="kpi-icon"><i class="fa-solid fa-clock"></i></div>
+                            <div class="kpi-data">
+                                <span class="kpi-label">Late Arrivals</span>
+                                <h3 id="kpi-late-today" class="kpi-value">0</h3>
+                            </div>
+                        </div>
+                        <div class="kpi-card glass-panel border-accent-purple">
+                            <div class="kpi-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+                            <div class="kpi-data">
+                                <span class="kpi-label">Pending Leaves</span>
+                                <h3 id="kpi-pending-leaves" class="kpi-value">0</h3>
+                            </div>
+                        </div>
+                        <div class="kpi-card glass-panel border-accent-cyan">
+                            <div class="kpi-icon"><i class="fa-solid fa-money-check-dollar"></i></div>
+                            <div class="kpi-data">
+                                <span class="kpi-label">Pending Payroll</span>
+                                <h3 id="kpi-pending-payroll" class="kpi-value">0</h3>
+                            </div>
+                        </div>
+                        <div class="kpi-card glass-panel border-accent-gold">
+                            <div class="kpi-icon"><i class="fa-solid fa-star"></i></div>
+                            <div class="kpi-data">
+                                <span class="kpi-label">Average Performance</span>
+                                <h3 id="kpi-avg-rating" class="kpi-value">0.0</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid mt-4">
+                        <div class="dashboard-card glass-panel">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-sitemap"></i> Department Distribution</h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="dept-distribution-list" class="dept-distribution-list">
+                                    <!-- Dynamic List -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card glass-panel">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-user-plus"></i> Recent Employees</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="data-table compact-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Code</th>
+                                                <th>Name</th>
+                                                <th>Department</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recent-employees-tbl">
+                                            <!-- Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card glass-panel">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-clock-rotate-left"></i> Pending Leave Approvals</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="data-table compact-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Employee</th>
+                                                <th>Type</th>
+                                                <th>Days</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recent-leaves-tbl">
+                                            <!-- Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- EMPLOYEES VIEW -->
+                <section id="view-employees" class="view-section">
+                    <div class="section-toolbar glass-panel">
+                        <div class="toolbar-search">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="employee-search-input" placeholder="Search by code, name, email or department...">
+                        </div>
+                        <div class="toolbar-actions">
+                            <select id="employee-status-filter" class="form-control">
+                                <option value="">All Statuses</option>
+                                <option value="ACTIVE">Active Only</option>
+                                <option value="INACTIVE">Inactive Only</option>
+                            </select>
+                            <button id="export-employees-csv" class="btn btn-outline-primary">
+                                <i class="fa-solid fa-file-csv"></i> Export Directory
+                            </button>
+                            <button id="add-employee-btn" class="btn btn-primary role-restricted-admin-hr">
+                                <i class="fa-solid fa-plus"></i> Add Employee
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-card glass-panel">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Employee Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Department</th>
+                                        <th>Designation</th>
+                                        <th>Joining Date</th>
+                                        <th>Salary</th>
+                                        <th>Status</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="employees-table-body">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ATTENDANCE VIEW -->
+                <section id="view-attendance" class="view-section">
+                    <div class="section-toolbar glass-panel">
+                        <div class="toolbar-search">
+                            <i class="fa-solid fa-calendar"></i>
+                            <input type="date" id="attendance-date-filter" class="form-control">
+                        </div>
+                        <div class="toolbar-actions">
+                            <button id="mark-attendance-btn" class="btn btn-primary">
+                                <i class="fa-solid fa-fingerprint"></i> Mark Attendance
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-card glass-panel">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Code</th>
+                                        <th>Employee Name</th>
+                                        <th>Department</th>
+                                        <th>Check In</th>
+                                        <th>Check Out</th>
+                                        <th>Hours</th>
+                                        <th>Status</th>
+                                        <th class="text-right role-restricted-admin-hr">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendance-table-body">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- LEAVE VIEW -->
+                <section id="view-leaves" class="view-section">
+                    <div class="section-toolbar glass-panel">
+                        <div class="filter-tabs">
+                            <button class="tab-btn active" data-leave-filter="ALL">All</button>
+                            <button class="tab-btn" data-leave-filter="PENDING">Pending</button>
+                            <button class="tab-btn" data-leave-filter="APPROVED">Approved</button>
+                            <button class="tab-btn" data-leave-filter="REJECTED">Rejected</button>
+                        </div>
+                        <div class="toolbar-actions">
+                            <button id="apply-leave-btn" class="btn btn-primary">
+                                <i class="fa-solid fa-paper-plane"></i> Apply Leave
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="leave-balance-grid mb-4">
+                        <div class="balance-card glass-panel">
+                            <div class="balance-icon balance-icon-casual"><i class="fa-solid fa-umbrella-beach"></i></div>
+                            <div class="balance-info">
+                                <span>Casual Leave</span>
+                                <h4>12 Days Left</h4>
+                            </div>
+                        </div>
+                        <div class="balance-card glass-panel">
+                            <div class="balance-icon balance-icon-sick"><i class="fa-solid fa-notes-medical"></i></div>
+                            <div class="balance-info">
+                                <span>Sick Leave</span>
+                                <h4>10 Days Left</h4>
+                            </div>
+                        </div>
+                        <div class="balance-card glass-panel">
+                            <div class="balance-icon balance-icon-annual"><i class="fa-solid fa-calendar-check"></i></div>
+                            <div class="balance-info">
+                                <span>Annual Leave</span>
+                                <h4>15 Days Left</h4>
+                            </div>
+                        </div>
+                        <div class="balance-card glass-panel">
+                            <div class="balance-icon balance-icon-unpaid"><i class="fa-solid fa-user-clock"></i></div>
+                            <div class="balance-info">
+                                <span>Unpaid Leave</span>
+                                <h4>0 Days Used</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-card glass-panel">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Submitted Date</th>
+                                        <th>Code</th>
+                                        <th>Employee Name</th>
+                                        <th>Type</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Days</th>
+                                        <th>Reason</th>
+                                        <th>Status</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leaves-table-body">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PAYROLL VIEW -->
+                <section id="view-payroll" class="view-section">
+                    <div class="section-toolbar glass-panel">
+                        <div class="toolbar-search">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="payroll-search-input" placeholder="Search payroll records...">
+                        </div>
+                        <div class="toolbar-actions">
+                            <button id="batch-payroll-btn" class="btn btn-emerald role-restricted-admin-hr" title="Generate payroll records for all active employees">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Batch Generate Payroll
+                            </button>
+                            <button id="add-payroll-btn" class="btn btn-primary role-restricted-admin-hr">
+                                <i class="fa-solid fa-plus"></i> Single Payroll
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-card glass-panel">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Period</th>
+                                        <th>Code</th>
+                                        <th>Employee Name</th>
+                                        <th>Department</th>
+                                        <th>Basic Salary</th>
+                                        <th>Allowances</th>
+                                        <th>Deductions</th>
+                                        <th>Net Salary</th>
+                                        <th>Status</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="payroll-table-body">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PERFORMANCE VIEW -->
+                <section id="view-performance" class="view-section">
+                    <div class="section-toolbar glass-panel">
+                        <div class="toolbar-search">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="performance-search-input" placeholder="Search reviews...">
+                        </div>
+                        <div class="toolbar-actions">
+                            <button id="add-performance-btn" class="btn btn-primary role-restricted-admin-hr">
+                                <i class="fa-solid fa-star"></i> Add Performance Review
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-card glass-panel">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Review Date</th>
+                                        <th>Code</th>
+                                        <th>Employee Name</th>
+                                        <th>Rating</th>
+                                        <th>Level</th>
+                                        <th>Reviewer</th>
+                                        <th>Goals & Feedback</th>
+                                        <th class="text-right role-restricted-admin-hr">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="performance-table-body">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- REPORTS VIEW -->
+                <section id="view-reports" class="view-section">
+                    <div class="report-tabs glass-panel mb-3">
+                        <button class="report-tab-btn active" data-report-type="employees"><i class="fa-solid fa-users"></i> Employee Directory</button>
+                        <button class="report-tab-btn" data-report-type="attendance"><i class="fa-solid fa-calendar-check"></i> Attendance Logs</button>
+                        <button class="report-tab-btn" data-report-type="leaves"><i class="fa-solid fa-calendar-minus"></i> Leave Summary</button>
+                        <button class="report-tab-btn" data-report-type="payroll"><i class="fa-solid fa-file-invoice-dollar"></i> Payroll Statement</button>
+                        <button class="report-tab-btn" data-report-type="performance"><i class="fa-solid fa-award"></i> Performance Analytics</button>
+                    </div>
+
+                    <!-- Dynamic Report Filters -->
+                    <div class="report-filter-panel glass-panel mb-4">
+                        <form id="report-filter-form" class="filter-grid">
+                            <!-- Filters will be generated dynamically based on active tab -->
+                        </form>
+                        <div class="filter-actions mt-3">
+                            <button type="button" id="apply-report-filters" class="btn btn-primary btn-sm"><i class="fa-solid fa-filter"></i> Apply Filters</button>
+                            <button type="button" id="reset-report-filters" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+                            <div class="export-actions">
+                                <button type="button" id="export-csv-btn" class="btn btn-success btn-sm"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+                                <button type="button" id="print-report-btn" class="btn btn-info btn-sm"><i class="fa-solid fa-print"></i> Print Report</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-card glass-panel" id="printable-report-area">
+                        <div class="report-print-header printable-only">
+                            <h2>HRMS NEXUS - ENTERPRISE REPORT</h2>
+                            <p id="report-date-subtitle"></p>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table" id="report-data-table">
+                                <thead id="report-table-head">
+                                    <!-- Dynamic -->
+                                </thead>
+                                <tbody id="report-table-body">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL CONTAINERS -->
+
+    <!-- Employee Modal -->
+    <div id="employee-modal" class="modal-backdrop hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3 id="employee-modal-title">Add New Employee</h3>
+                <button class="close-modal btn-icon"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="employee-form">
+                <input type="hidden" id="emp-id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="emp-code">Employee Code *</label>
+                        <input type="text" id="emp-code" placeholder="e.g. EMP011" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-name">Full Name *</label>
+                        <input type="text" id="emp-name" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-email">Email Address *</label>
+                        <input type="email" id="emp-email" placeholder="john.doe@company.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-phone">Phone Number *</label>
+                        <input type="text" id="emp-phone" placeholder="+1-555-0199" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-dept">Department *</label>
+                        <input type="text" id="emp-dept" placeholder="Engineering, HR, Finance..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-desig">Designation *</label>
+                        <input type="text" id="emp-desig" placeholder="Senior Developer..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-joining">Joining Date *</label>
+                        <input type="date" id="emp-joining" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-salary">Base Salary ($) *</label>
+                        <input type="number" step="0.01" id="emp-salary" placeholder="75000.00" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-status">Status</label>
+                        <select id="emp-status" class="form-control">
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="INACTIVE">INACTIVE</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" id="save-emp-btn" class="btn btn-primary">Save Employee</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Attendance Modal -->
+    <div id="attendance-modal" class="modal-backdrop hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3 id="attendance-modal-title">Mark Attendance</h3>
+                <button class="close-modal btn-icon"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="attendance-form">
+                <input type="hidden" id="att-id">
+                <div class="form-group">
+                    <label for="att-employee">Employee *</label>
+                    <select id="att-employee" class="form-control" required></select>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="att-date">Date *</label>
+                        <input type="date" id="att-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="att-checkin">Check In Time</label>
+                        <input type="time" id="att-checkin">
+                    </div>
+                    <div class="form-group">
+                        <label for="att-checkout">Check Out Time</label>
+                        <input type="time" id="att-checkout">
+                    </div>
+                    <div class="form-group">
+                        <label for="att-status">Status (Auto-calculated if blank)</label>
+                        <select id="att-status" class="form-control">
+                            <option value="">Auto Detect</option>
+                            <option value="PRESENT">PRESENT</option>
+                            <option value="ABSENT">ABSENT</option>
+                            <option value="HALF_DAY">HALF_DAY</option>
+                            <option value="LATE">LATE</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" id="save-att-btn" class="btn btn-primary">Save Attendance</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Leave Modal -->
+    <div id="leave-modal" class="modal-backdrop hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3>Apply For Leave</h3>
+                <button class="close-modal btn-icon"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="leave-form">
+                <div class="form-group">
+                    <label for="leave-employee">Employee *</label>
+                    <select id="leave-employee" class="form-control" required></select>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="leave-type">Leave Type *</label>
+                        <select id="leave-type" class="form-control" required>
+                            <option value="CASUAL">CASUAL</option>
+                            <option value="SICK">SICK</option>
+                            <option value="EARNED">EARNED</option>
+                            <option value="UNPAID">UNPAID</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="leave-start">Start Date *</label>
+                        <input type="date" id="leave-start" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="leave-end">End Date *</label>
+                        <input type="date" id="leave-end" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Duration</label>
+                        <div id="leave-days-preview" class="days-preview-badge">1 Day(s)</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="leave-reason">Reason *</label>
+                    <textarea id="leave-reason" rows="3" class="form-control" placeholder="Provide detailed explanation for leave request..." required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" id="save-leave-btn" class="btn btn-primary">Submit Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payroll Modal -->
+    <div id="payroll-modal" class="modal-backdrop hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3 id="payroll-modal-title">Generate Payroll</h3>
+                <button class="close-modal btn-icon"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="payroll-form">
+                <input type="hidden" id="pay-id">
+                <div class="form-group">
+                    <label for="pay-employee">Employee *</label>
+                    <select id="pay-employee" class="form-control" required></select>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="pay-month">Month (1-12) *</label>
+                        <input type="number" id="pay-month" min="1" max="12" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pay-year">Year *</label>
+                        <input type="number" id="pay-year" min="2000" max="2100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pay-basic">Basic Salary ($) *</label>
+                        <input type="number" step="0.01" id="pay-basic" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pay-allowances">Allowances ($)</label>
+                        <input type="number" step="0.01" id="pay-allowances" min="0" value="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="pay-deductions">Deductions ($)</label>
+                        <input type="number" step="0.01" id="pay-deductions" min="0" value="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Calculated Net Salary</label>
+                        <div id="pay-net-preview" class="net-salary-preview">$0.00</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pay-status">Payment Status</label>
+                        <select id="pay-status" class="form-control">
+                            <option value="PENDING">PENDING</option>
+                            <option value="PAID">PAID</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" id="save-payroll-btn" class="btn btn-primary">Save Payroll</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Printable Salary Slip Modal -->
+    <div id="salary-slip-modal" class="modal-backdrop hidden">
+        <div class="modal-content glass-panel salary-slip-modal-content">
+            <div class="modal-header">
+                <h3>Salary Slip Preview</h3>
+                <button class="close-modal btn-icon"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="salary-slip-printable" class="salary-slip-container">
+                <div class="slip-header">
+                    <div class="slip-brand">
+                        <h2>HRMS NEXUS INC.</h2>
+                        <p>Enterprise Global Payroll System</p>
+                    </div>
+                    <div class="slip-title-box">
+                        <h3>SALARY SLIP</h3>
+                        <p id="slip-period">Period: --/----</p>
+                    </div>
+                </div>
+                <hr class="slip-divider">
+                <div class="slip-details-grid">
+                    <div><strong>Employee Name:</strong> <span id="slip-emp-name">--</span></div>
+                    <div><strong>Employee Code:</strong> <span id="slip-emp-code">--</span></div>
+                    <div><strong>Department:</strong> <span id="slip-emp-dept">--</span></div>
+                    <div><strong>Designation:</strong> <span id="slip-emp-desig">--</span></div>
+                    <div><strong>Payment Status:</strong> <span id="slip-pay-status" class="badge">--</span></div>
+                    <div><strong>Payment Date:</strong> <span id="slip-pay-date">--</span></div>
+                </div>
+                <table class="slip-table">
+                    <thead>
+                        <tr>
+                            <th>Earnings / Basic</th>
+                            <th class="text-right">Amount ($)</th>
+                            <th>Deductions</th>
+                            <th class="text-right">Amount ($)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Basic Salary</td>
+                            <td class="text-right" id="slip-basic">$0.00</td>
+                            <td>Tax & Deductions</td>
+                            <td class="text-right" id="slip-deductions">$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Allowances & Bonuses</td>
+                            <td class="text-right" id="slip-allowances">$0.00</td>
+                            <td>-</td>
+                            <td class="text-right">-</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3">NET SALARY PAYABLE</th>
+                            <th class="text-right" id="slip-net">$0.00</th>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="slip-footer">
+                    <p>This is a computer-generated salary slip and requires no physical signature.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary close-modal">Close</button>
+                <button type="button" onclick="window.print()" class="btn btn-info"><i class="fa-solid fa-print"></i> Print Payslip</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Review Modal -->
+    <div id="performance-modal" class="modal-backdrop hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3 id="performance-modal-title">Performance Review</h3>
+                <button class="close-modal btn-icon"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="performance-form">
+                <input type="hidden" id="perf-id">
+                <div class="form-group">
+                    <label for="perf-employee">Employee *</label>
+                    <select id="perf-employee" class="form-control" required></select>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="perf-date">Review Date *</label>
+                        <input type="date" id="perf-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="perf-rating">Rating (1.0 to 5.0) *</label>
+                        <input type="number" step="0.1" id="perf-rating" min="1" max="5" placeholder="4.5" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="perf-reviewer">Reviewer Name *</label>
+                        <input type="text" id="perf-reviewer" placeholder="e.g. Sarah Jenkins (HR Director)" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="perf-goals">Goals Achieved</label>
+                    <textarea id="perf-goals" rows="2" class="form-control" placeholder="Key deliverables and objectives met..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="perf-feedback">Feedback & Comments</label>
+                    <textarea id="perf-feedback" rows="2" class="form-control" placeholder="Constructive manager feedback..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" id="save-perf-btn" class="btn btn-primary">Save Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Employee Detail Profile Modal -->
+    <div id="employee-detail-modal" class="modal-backdrop hidden">
+        <div class="modal-content glass-panel modal-lg">
+            <div class="modal-header">
+                <h3>Employee Profile Details</h3>
+                <button class="close-modal btn-icon"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="emp-profile-body">
+                <div class="emp-profile-header">
+                    <div class="emp-avatar-lg" id="detail-emp-avatar">JD</div>
+                    <div class="emp-title-info">
+                        <h2 id="detail-emp-name">Jane Doe</h2>
+                        <p id="detail-emp-role-dept"><span id="detail-emp-designation">Senior Developer</span> • <span id="detail-emp-dept">Engineering</span></p>
+                        <span id="detail-emp-status" class="badge badge-success">ACTIVE</span>
+                    </div>
+                </div>
+                <div class="emp-details-grid">
+                    <div class="detail-box">
+                        <span class="detail-label"><i class="fa-solid fa-id-badge"></i> Employee Code</span>
+                        <strong id="detail-emp-code">EMP001</strong>
+                    </div>
+                    <div class="detail-box">
+                        <span class="detail-label"><i class="fa-solid fa-envelope"></i> Email Address</span>
+                        <strong id="detail-emp-email">jane@company.com</strong>
+                    </div>
+                    <div class="detail-box">
+                        <span class="detail-label"><i class="fa-solid fa-phone"></i> Phone Number</span>
+                        <strong id="detail-emp-phone">+1 555-0199</strong>
+                    </div>
+                    <div class="detail-box">
+                        <span class="detail-label"><i class="fa-solid fa-calendar-day"></i> Date of Joining</span>
+                        <strong id="detail-emp-doj">2024-01-15</strong>
+                    </div>
+                    <div class="detail-box">
+                        <span class="detail-label"><i class="fa-solid fa-sack-dollar"></i> Base Salary</span>
+                        <strong id="detail-emp-salary">$85,000 / year</strong>
+                    </div>
+                    <div class="detail-box">
+                        <span class="detail-label"><i class="fa-solid fa-phone-volume"></i> Emergency Contact</span>
+                        <strong id="detail-emp-emergency">John Doe (Spouse) - +1 555-0200</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary close-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
